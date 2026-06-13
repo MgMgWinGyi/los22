@@ -15,19 +15,18 @@ jobs:
 
       - name: Setup Crave
         run: |
-          # 1. Crave CLI နောက်ဆုံးဗားရှင်း Official Link ကို သုံးပြီး ဒေါင်းလော့ဆွဲခြင်း
-          curl -s https://raw.githubusercontent.com/crave-io/crave-cli/main/get_crave.sh | bash
+          # 1. Crave CLI ရဲ့ နောက်ဆုံးထွက် ဗားရှင်းကို တရားဝင် Repository ထဲကနေ တိုက်ရိုက် Download ဆွဲခြင်း
+          curl -s https://raw.githubusercontent.com/accupara/crave/master/get_crave.sh | bash -s --
           
-          # 2. ရလာတဲ့ crave binary ကို Run လို့ရအောင် Executable Permission ပေးခြင်း
+          # 2. ဒေါင်းလော့လုပ်ပြီးသား crave ကို executable permission ပေးခြင်း
           chmod +x ./crave
           
-          # 3. Crave ကို Token သုံးပြီး အသက်သွင်းခြင်း
+          # 3. Crave ကို Token အသုံးပြုပြီး ချိတ်ဆက်ခြင်း
           ./crave setup --token $CRAVE_TOKEN
 
       - name: Initialize Source and Build
         run: |
           # Crave ကိုသုံးပြီး Redmi Note 10 (mojito) အတွက် ROM ကို Build လုပ်ခြင်း
-          # သတိပြုရန်: လမ်းကြောင်းကို ./crave run ဟု ပြောင်းလဲထားပါသည်
           
           ./crave run -- "
             # 1. LineageOS Source ကို Initialize လုပ်ခြင်း (Lineage 21.0 - Android 14)
@@ -60,4 +59,4 @@ jobs:
         with:
           name: LineageOS-Redmi-Note10-Zip
           path: out/target/product/mojito/lineage-*.zip
-          retention-days: 1 # ထွက်လာမည့်
+          retention-days: 1 # ထွက်လာမည့် ROM Zip ကို GitHub ပေါ်တွင် 1 ရက် သိမ်းဆည်းထားမည်
