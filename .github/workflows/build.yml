@@ -15,38 +15,41 @@ jobs:
 
       - name: Setup Crave
         run: |
-          # Crave CLI ကို Download ဆွဲခြင်း
-          curl -s https://raw.githubusercontent.com/crave-cp/crave/main/get_crave.sh | bash
+          # 1. Crave CLI နောက်ဆုံးဗားရှင်း Official Link ကို သုံးပြီး ဒေါင်းလော့ဆွဲခြင်း
+          curl -s https://raw.githubusercontent.com/crave-io/crave-cli/main/get_crave.sh | bash
           
-          # Setup လုပ်ခြင်း
-          ./crave/crave setup --token $CRAVE_TOKEN
+          # 2. ရလာတဲ့ crave binary ကို Run လို့ရအောင် Executable Permission ပေးခြင်း
+          chmod +x ./crave
+          
+          # 3. Crave ကို Token သုံးပြီး အသက်သွင်းခြင်း
+          ./crave setup --token $CRAVE_TOKEN
 
       - name: Initialize Source and Build
         run: |
-          # Crave ကိုသုံးပြီး Redmi Note 10 (mojito) အတွက် ROM ရော Kernel ပါ Build လုပ်ခြင်း
+          # Crave ကိုသုံးပြီး Redmi Note 10 (mojito) အတွက် ROM ကို Build လုပ်ခြင်း
+          # သတိပြုရန်: လမ်းကြောင်းကို ./crave run ဟု ပြောင်းလဲထားပါသည်
           
-          ./crave/crave run -- "
-            # 1. LineageOS Source ကို Initialize လုပ်ခြင်း (Lineage 21.0 - Android 14 ကို Base ထားပါသည်)
+          ./crave run -- "
+            # 1. LineageOS Source ကို Initialize လုပ်ခြင်း (Lineage 21.0 - Android 14)
             repo init -u https://github.com/LineageOS/android.git -b lineage-21.0 --git-lfs --depth=1
             
-            # 2. Redmi Note 10 အတွက် Local Manifest (Tree များ) အလိုအလျောက် ထည့်သွင်းခြင်း
+            # 2. Redmi Note 10 အတွက် Local Manifest (Device, Vendor, Kernel Trees) အလိုအလျောက် တည်ဆောက်ခြင်း
             mkdir -p .repo/local_manifests
             
-            # Device, Vendor, Kernel Trees များကို ကြိုတင်သတ်မှတ်ပေးခြင်း
             cat <<EOF > .repo/local_manifests/mojito.xml
-            <?xml version="1.0" encoding="UTF-8"?>
+            <?xml version=\"1.0\" encoding=\"UTF-8\"?>
             <manifest>
-              <project path="device/xiaomi/mojito" name="LineageOS/android_device_xiaomi_mojito" remote="github" revision="lineage-21.0" />
-              <project path="hardware/xiaomi" name="LineageOS/android_hardware_xiaomi" remote="github" revision="lineage-21.0" />
-              <project path="kernel/xiaomi/mojito" name="LineageOS/android_kernel_xiaomi_mojito" remote="github" revision="lineage-21.0" />
-              <project path="vendor/xiaomi/mojito" name="TheMuppets/proprietary_vendor_xiaomi_mojito" remote="github" revision="lineage-21.0" />
+              <project path=\"device/xiaomi/mojito\" name=\"LineageOS/android_device_xiaomi_mojito\" remote=\"github\" revision=\"lineage-21.0\" />
+              <project path=\"hardware/xiaomi\" name=\"LineageOS/android_hardware_xiaomi\" remote=\"github\" revision=\"lineage-21.0\" />
+              <project path=\"kernel/xiaomi/mojito\" name=\"LineageOS/android_kernel_xiaomi_mojito\" remote=\"github\" revision=\"lineage-21.0\" />
+              <project path=\"vendor/xiaomi/mojito\" name=\"TheMuppets/proprietary_vendor_xiaomi_mojito\" remote=\"github\" revision=\"lineage-21.0\" />
             </manifest>
           EOF
 
-            # 3. Source Code များအားလုံးကို Sync လုပ်ခြင်း
+            # 3. Source Code များအားလုံးကို Speed အမြန်ဆုံးဖြင့် Sync လုပ်ခြင်း
             repo sync -c -j\$(nproc --all) --force-sync --no-clone-bundle --no-tags
             
-            # 4. Environment Setup လုပ်ပြီး Build စတင်ခြင်း
+            # 4. Environment Setup လုပ်ပြီး Redmi Note 10 (mojito) အတွက် Build စတင်ခြင်း
             source build/envsetup.sh
             lunch lineage_mojito-userdebug
             mka bacon
@@ -57,4 +60,4 @@ jobs:
         with:
           name: LineageOS-Redmi-Note10-Zip
           path: out/target/product/mojito/lineage-*.zip
-          retention-days: 1 # Zip ဖိုင်ကို GitHub ပေါ်တွင် 1 ရက်ပဲ သိမ်းထားမည်
+          retention-days: 1 # ထွက်လာမည့်
